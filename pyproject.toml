@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "SQLMigrately"
-version = "0.0.1"
+version = "0.0.2"
 description = "Live migration tool for SQL databases"
 readme = "README.md"
 authors = [{ name = "blacksuan19", email = "py@blacksuan19.dev" }]
@@ -21,7 +21,7 @@ dev = ["black", "bumpver", "pip-tools", "wheel"]
 
 
 [tool.bumpver]
-current_version = "0.0.1"
+current_version = "0.0.2"
 version_pattern = "MAJOR.MINOR.PATCH"
 commit_message = "Bump version {old_version} -> {new_version}"
 commit = true
