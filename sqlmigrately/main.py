@@ -14,7 +14,21 @@ def migrate_table(
     add_cols: bool = True,
     remove_cols: bool = False,
 ):
-    """migrate a table to match the dataframe schema"""
+    """
+    Update given `table_name` schema in the database to match the schema of the given `df`.
+    Assumes minimal changes to the table schema.
+
+    Args:
+        table_name (str): name of the table
+        df (pd.DataFrame): dataframe to migrate
+        db_eng (Engine): sqlalchemy engine
+        push_data (bool, optional): whether to push dataframe data to the table. Defaults to True.
+        add_cols (bool, optional): whether to add new columns in dataframe to the table. Defaults to True.
+        remove_cols (bool, optional): whether to remove removed columns from the table. Defaults to False.
+
+    Raises:
+        TableDoesNotExistError: raised when the given table does not exist in the database
+    """
     diff = get_table_diff(table_name, df, db_eng)
 
     if diff.added:
