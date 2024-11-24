@@ -40,7 +40,7 @@ def get_table_cols(table_name: str, db_eng: Engine) -> Dict[str, str]:
     return {col.get("name"): col.get("type") for col in cols}
 
 
-def get_table_diff(table_name: str, df: pd.DataFrame, db_eng: Engine) -> ColumnDiff:
+def get_schema_diff(table_name: str, df: pd.DataFrame, db_eng: Engine) -> ColumnDiff:
     """get the difference between the dataframe and the table schema"""
     table_cols = get_table_cols(table_name, db_eng)
     df_cols = set(df.columns)

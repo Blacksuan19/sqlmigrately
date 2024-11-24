@@ -4,7 +4,7 @@ import pandas as pd
 from loguru import logger
 from sqlalchemy import Engine
 
-from sqlmigrately.utils import TableOps, alter_table, get_table_diff
+from sqlmigrately.utils import TableOps, alter_table, get_schema_diff
 
 
 def migrate_table(
@@ -33,7 +33,7 @@ def migrate_table(
     Raises:
         TableDoesNotExistError: raised when the given table does not exist in the database
     """
-    diff = get_table_diff(table_name, df, db_eng)
+    diff = get_schema_diff(table_name, df, db_eng)
     partial_alter_table = partial(
         alter_table,
         table_name=table_name,
