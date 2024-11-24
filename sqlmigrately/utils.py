@@ -1,10 +1,10 @@
+from dataclasses import dataclass, field
 from enum import Enum
 from string import Template
 from typing import Any, Dict, List
 
 import pandas as pd
 from loguru import logger
-from pydantic import BaseModel
 from sqlalchemy import Engine, inspect, text
 
 from sqlmigrately.exceptions import TableDoesNotExistError, UnknownOperationError
@@ -15,11 +15,12 @@ class TableOps(str, Enum):
     REMOVE = "REMOVE"
 
 
-class ColumnDiff(BaseModel):
+@dataclass
+class ColumnDiff:
     """class to hold the difference between two sets of columns"""
 
-    added: List[Dict[str, Any]] = set()
-    removed: List[Dict[str, Any]] = set()
+    added: List[Dict[str, Any]] = field(default_factory=list)
+    removed: List[Dict[str, Any]] = field(default_factory=list)
 
 
 def check_table(table_name: str, db_eng: Engine) -> bool:
