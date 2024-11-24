@@ -8,6 +8,7 @@ from loguru import logger
 from sqlalchemy import Engine, inspect, text
 
 from sqlmigrately.exceptions import TableDoesNotExistError, UnknownOperationError
+from sqlmigrately.types import map_type
 
 
 class TableOps(str, Enum):
@@ -29,7 +30,7 @@ def check_table(table_name: str, db_eng: Engine) -> bool:
 
 
 def get_table_cols(table_name: str, db_eng: Engine) -> Dict[str, str]:
-    """get columns of a table and their types"""
+    """get mapping of table columns and their types"""
 
     if not check_table(table_name, db_eng):
         raise TableDoesNotExistError(table_name)
@@ -62,8 +63,22 @@ def alter_table(
     db_eng: Engine,
     *,
     operation: TableOps,
+    column_type_map: Dict[str, str] = None,
 ):
-    """add columns to a table to match the dataframe schema"""
+    """
+    alter table schema by adding or removing columns based on the operation,
+    this works on a single column at a time for compatibility with sqlite.
+
+    Args:
+        table_name (str): name of the table
+        columns (List[Dict[str, str]]): list of columns to add
+        db_eng (Engine): sqlalchemy engine
+        operation (TableOps): operation to perform
+        column_type_map (Dict[str, str], optional): mapping of column names to their types. Defaults to None.
+
+    Raises:
+        UnknownOperationError: raised when an unknown operation is provided
+    """
 
     sql_template = Template(f"ALTER TABLE {table_name} $operation $column")
 
@@ -77,8 +92,12 @@ def alter_table(
         raise UnknownOperationError(operation)
 
     for col in columns:
+        col_type = map_type(col.get("type"))
+        if column_type_map and col.get("name") in column_type_map:
+            col_type = column_type_map[col.get("name")]
+
         sql = Template(sql_template).safe_substitute(
-            column=col.get("name"), column_type=col.get("type")
+            column=col.get("name"), column_type=str(col_type)
         )
 
         logger.info(f"Executing: {sql}")
