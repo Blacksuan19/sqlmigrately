@@ -28,7 +28,7 @@ def check_table(table_name: str, db_eng: Engine) -> bool:
 
 
 def get_table_cols(table_name: str, db_eng: Engine) -> Dict[str, str]:
-    """get columns of a table as a set of strings"""
+    """get columns of a table and their types"""
 
     if not check_table(table_name, db_eng):
         raise TableDoesNotExistError(table_name)
