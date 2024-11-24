@@ -102,5 +102,6 @@ def alter_table(
 
         logger.info(f"Executing: {sql}")
 
-        with db_eng.connect().begin() as conn:
+        with db_eng.connect() as conn:
             conn.execute(text(sql))
+            conn.commit()
