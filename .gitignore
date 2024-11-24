@@ -2,6 +2,7 @@
 *.json
 .directory
 .vscode/
+*.db
 
 # package build
 dist/
