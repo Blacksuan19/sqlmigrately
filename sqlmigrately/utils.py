@@ -29,7 +29,7 @@ def check_table(table_name: str, db_eng: Engine) -> bool:
     return inspect(db_eng).has_table(table_name)
 
 
-def get_table_cols(table_name: str, db_eng: Engine) -> Dict[str, str]:
+def get_table_schema(table_name: str, db_eng: Engine) -> Dict[str, str]:
     """get mapping of table columns and their types"""
 
     if not check_table(table_name, db_eng):
@@ -42,7 +42,7 @@ def get_table_cols(table_name: str, db_eng: Engine) -> Dict[str, str]:
 
 def get_schema_diff(table_name: str, df: pd.DataFrame, db_eng: Engine) -> ColumnDiff:
     """get the difference between the dataframe and the table schema"""
-    table_cols = get_table_cols(table_name, db_eng)
+    table_cols = get_table_schema(table_name, db_eng)
     df_cols = set(df.columns)
 
     table_col_names = set(table_cols.keys())
