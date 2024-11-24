@@ -33,7 +33,7 @@ control the behavior of the migration.
 ```python
 import pandas as pd
 
-from sqlmigrately import migrate_table
+from sqlmigrately import migrate_table, ColumnDiff
 from sqlalchemy import create_engine
 
 # create a connection to the database
@@ -58,11 +58,17 @@ df = pd.DataFrame({
     'country': ['USA', 'USA']
 })
 
+# report the diff to slack or any other service
+def diff_callback(diff: ColumnDiff):
+    print(f'added columns: {diff.added}')
+    print(f'removed columns: {diff.removed}')
+
 # apply the migration
-migrate_table(df, 'users', engine, push_data=True)
+migrate_table(df, 'users', engine, push_data=True, column_diff_callback=diff_callback)
 
 # show updated table and schema
 df = pd.read_sql('SELECT * FROM users', engine)
+df
 ```
 
 | name  | age | city        | country |
@@ -88,6 +94,7 @@ def migrate_table(
     add_cols: bool = True,
     remove_cols: bool = False,
     column_type_map: dict = None,
+    column_diff_callback: Callable[[ColumnDiff], None] = None,
 ):
     """
     Update given `table_name` schema in the database to match the schema of the given `df`.
@@ -100,7 +107,10 @@ def migrate_table(
         push_data (bool, optional): whether to push dataframe data to the table. Defaults to True.
         add_cols (bool, optional): whether to add new columns in dataframe to the table. Defaults to True.
         remove_cols (bool, optional): whether to remove removed columns from the table. Defaults to False.
-        column_type_map (dict, optional): mapping of column names to their types. Defaults to None, which means that the types are inferred from the dataframe.
+        column_type_map (dict, optional): mapping of column names to their types. Defaults to None,
+        which means that the types are inferred from the dataframe.
+        column_diff_callback (Callable[[ColumnDiff], None], optional): callback function to be called with the
+        column diff. Defaults to None. designed for manual logging such as sending to a logging service or slack.
 
     Raises:
         TableDoesNotExistError: raised when the given table does not exist in the database
