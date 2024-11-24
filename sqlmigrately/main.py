@@ -1,10 +1,11 @@
 from functools import partial
+from typing import Callable
 
 import pandas as pd
 from loguru import logger
 from sqlalchemy import Engine
 
-from sqlmigrately.utils import TableOps, alter_table, get_schema_diff
+from sqlmigrately.utils import ColumnDiff, TableOps, alter_table, get_schema_diff
 
 
 def migrate_table(
@@ -16,6 +17,7 @@ def migrate_table(
     add_cols: bool = True,
     remove_cols: bool = False,
     column_type_map: dict = None,
+    column_diff_callback: Callable[[ColumnDiff], None] = None,
 ):
     """
     Update given `table_name` schema in the database to match the schema of the given `df`.
@@ -29,6 +31,7 @@ def migrate_table(
         add_cols (bool, optional): whether to add new columns in dataframe to the table. Defaults to True.
         remove_cols (bool, optional): whether to remove removed columns from the table. Defaults to False.
         column_type_map (dict, optional): mapping of column names to their types. Defaults to None, which means that the types are inferred from the dataframe.
+        column_diff_callback (Callable[[ColumnDiff], None], optional): callback function to be called with the column diff. Defaults to None. designed for manual logging such as sending to a logging service or slack.
 
     Raises:
         TableDoesNotExistError: raised when the given table does not exist in the database
@@ -50,6 +53,9 @@ def migrate_table(
         logger.info(f"Detected removed columns: {diff.removed}")
         if remove_cols:
             partial_alter_table(columns=diff.removed, operation=TableOps.REMOVE)
+
+    if column_diff_callback:
+        column_diff_callback(diff)
 
     if push_data:
         logger.info(f"Appending data to table: {table_name}")
