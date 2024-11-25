@@ -1,4 +1,4 @@
-__version__ = "0.1.1"
+__version__ = "0.1.2"
 from .main import migrate_table
 from .types import map_type
 from .utils import (
